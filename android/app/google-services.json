@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "126666789177",
+    "project_id": "alarmit-557f4",
+    "storage_bucket": "alarmit-557f4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126666789177:android:a2c55366a77b45363098e8",
+        "android_client_info": {
+          "package_name": "com.alarmit.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjLLbT1lBrBF4xNoXbO4SRiEId9J1rcPk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
