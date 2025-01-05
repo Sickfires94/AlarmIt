@@ -43,6 +43,7 @@ dev_dependencies:
   firebase_auth: ^5.3.3
   flutter_bloc: ^8.1.6
   cloud_firestore: ^5.5.0
+  alarm: ^4.1.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

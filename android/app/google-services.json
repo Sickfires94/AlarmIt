@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:126666789177:android:a2c55366a77b45363098e8",
         "android_client_info": {
-          "package_name": "com.alarmit.app"
+          "package_name": "com.example.alarm_it"
         }
       },
       "oauth_client": [],
