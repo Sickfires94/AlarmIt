@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCjLLbT1lBrBF4xNoXbO4SRiEId9J1rcPk',
-    appId: '1:126666789177:android:a2c55366a77b45363098e8',
+    appId: '1:126666789177:android:d77f7a0e887b78c23098e8',
     messagingSenderId: '126666789177',
     projectId: 'alarmit-557f4',
     storageBucket: 'alarmit-557f4.firebasestorage.app',
@@ -64,6 +64,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '126666789177',
     projectId: 'alarmit-557f4',
     storageBucket: 'alarmit-557f4.firebasestorage.app',
+    androidClientId: '126666789177-64rdl91bp7l9bnnui4s8lnumsekpu4ab.apps.googleusercontent.com',
+    iosClientId: '126666789177-u1ff5i9vrcon0dua1rcr1q71jbu7s43g.apps.googleusercontent.com',
     iosBundleId: 'com.example.alarmIt',
   );
 
@@ -73,6 +75,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '126666789177',
     projectId: 'alarmit-557f4',
     storageBucket: 'alarmit-557f4.firebasestorage.app',
+    androidClientId: '126666789177-64rdl91bp7l9bnnui4s8lnumsekpu4ab.apps.googleusercontent.com',
+    iosClientId: '126666789177-u1ff5i9vrcon0dua1rcr1q71jbu7s43g.apps.googleusercontent.com',
     iosBundleId: 'com.example.alarmIt',
   );
 
@@ -85,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'alarmit-557f4.firebasestorage.app',
     measurementId: 'G-DB82FVH5YG',
   );
+
 }

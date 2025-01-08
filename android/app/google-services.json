@@ -9,10 +9,23 @@
       "client_info": {
         "mobilesdk_app_id": "1:126666789177:android:a2c55366a77b45363098e8",
         "android_client_info": {
-          "package_name": "com.example.alarm_it"
+          "package_name": "com.alarmit.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "126666789177-64rdl91bp7l9bnnui4s8lnumsekpu4ab.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alarmit.app",
+            "certificate_hash": "d5d4b3319264c71bc26039fe0163fb9be34d6a9f"
+          }
+        },
+        {
+          "client_id": "126666789177-qbgr5as1kiv7duqkublgsipvgvhicgj5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCjLLbT1lBrBF4xNoXbO4SRiEId9J1rcPk"
@@ -20,7 +33,63 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126666789177-qbgr5as1kiv7duqkublgsipvgvhicgj5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "126666789177-u1ff5i9vrcon0dua1rcr1q71jbu7s43g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.alarmIt"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126666789177:android:d77f7a0e887b78c23098e8",
+        "android_client_info": {
+          "package_name": "com.example.alarm_it"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "126666789177-05jvmn6me2j9vflp1so3kppai312epdc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.alarm_it",
+            "certificate_hash": "d5d4b3319264c71bc26039fe0163fb9be34d6a9f"
+          }
+        },
+        {
+          "client_id": "126666789177-qbgr5as1kiv7duqkublgsipvgvhicgj5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjLLbT1lBrBF4xNoXbO4SRiEId9J1rcPk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126666789177-qbgr5as1kiv7duqkublgsipvgvhicgj5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "126666789177-u1ff5i9vrcon0dua1rcr1q71jbu7s43g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.alarmIt"
+              }
+            }
+          ]
         }
       }
     }

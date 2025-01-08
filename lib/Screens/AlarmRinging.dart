@@ -5,8 +5,9 @@ import 'package:alarm_it/Services/AlarmService.dart';
 import 'package:flutter/material.dart';
 
 class AlarmRingScreen extends StatefulWidget {
-  const AlarmRingScreen({required this.alarmSettings, super.key});
+  const AlarmRingScreen({required this.alarmSettings, required this.alarmService,  super.key});
 
+  final AlarmService alarmService;
   final AlarmSettings alarmSettings;
 
   @override
@@ -39,7 +40,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   
   void stopAlarm(){
     // Get current weekday and figure out the next day to recall alarm
-    AlarmService.handleAlarmStop(widget.alarmSettings.id);
+    widget.alarmService.handleAlarmStop(widget.alarmSettings.id);
   }
 
   @override
@@ -57,22 +58,30 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                RawMaterialButton(
-                  onPressed: () async => Alarm.set(
-                    alarmSettings: widget.alarmSettings.copyWith(
-                      dateTime: DateTime.now().add(const Duration(minutes: 1)),
-                    ),
-                  ),
-                  child: Text(
-                    'Snooze',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
+                // RawMaterialButton(
+                //   onPressed: () async => Alarm.set(
+                //     alarmSettings: widget.alarmSettings.copyWith(
+                //       dateTime: DateTime.now().add(const Duration(minutes: 1)),
+                //     ),
+                //   ),
+                //   child: Text(
+                //     'Snooze',
+                //     style: Theme.of(context).textTheme.titleLarge,
+                //   ),
+                // ),
                 RawMaterialButton(
                   onPressed: stopAlarm,
+                  shape: const CircleBorder(), // Makes the button circular
+                  fillColor: Colors.red, // Red background color
+                  elevation: 5, // Optional: Adds shadow for 3D effect
+                  padding: const EdgeInsets.all(30), // Adjust padding to control size
                   child: Text(
                     'Stop',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: TextStyle(
+                      fontSize: 24, // Large font size
+                      fontWeight: FontWeight.bold, // Bold text
+                      color: Colors.white, // White text
+                    ),
                   ),
                 ),
               ],

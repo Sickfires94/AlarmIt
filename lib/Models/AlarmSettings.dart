@@ -1,5 +1,6 @@
 
 import 'package:alarm/alarm.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AlarmCustom{
   int id;
@@ -36,6 +37,38 @@ class AlarmCustom{
     required this.repeatNo,
     required this.delay,
 });
+
+  factory AlarmCustom.fromJson(Map<String, dynamic> json) => AlarmCustom(
+    id: json['id'],
+    enabled: json['enabled'],
+    hour: json['hour'],
+    minute: json['minute'],
+    alarmMusicPath: json['alarmMusicPath'],
+    loopAudio: json['loopAudio'],
+    volume: json['volume'] as double?,
+    vibrate: json['vibrate'],
+    title: json['title'],
+    body: json['body'],
+    ringingDays: List<bool>.from(json['ringingDays']),
+    repeatNo: json['repeatNo'],
+    delay: json['delay'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'enabled': enabled,
+    'hour': hour,
+    'minute': minute,
+    'alarmMusicPath': alarmMusicPath,
+    'loopAudio': loopAudio,
+    'volume': volume,
+    'vibrate': vibrate,
+    'title': title,
+    'body': body,
+    'ringingDays': ringingDays,
+    'repeatNo': repeatNo,
+    'delay': delay,
+  };
 
 
 }

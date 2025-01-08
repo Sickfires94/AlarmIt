@@ -1,33 +1,77 @@
 import 'package:alarm_it/Models/AlarmSettings.dart';
 import 'package:alarm/alarm.dart';
+import 'package:alarm_it/Services/AlarmFirestore.dart';
+import 'package:alarm_it/Services/AlarmListBloc.dart';
+import 'package:alarm_it/main.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AlarmService {
+  late List<AlarmCustom> alarms;
+  AlarmFirestoreService alarmFirestoreService;
 
-  static List<AlarmCustom> alarms = [];
+  AlarmService({required this.alarms, required this.alarmFirestoreService});
+
+
 
 
   /// implement a function to set the next alarm according to the ALarmCustom provided
-  static void addAlarm(AlarmCustom alarm){
+  void addAlarm(AlarmCustom alarm){
+    bool exists = false;
 
+    // print("Editing alarm? " + alarms.contains(alarm).toString());
+    //
 
+    for (int i = 0; i < alarms.length; i++){
+      if(alarms[i].id == alarm.id){
+        alarms[i] = alarm;
+        stopAlarm(alarm.id);
+        exists = true;
+        break;
+      }
+    }
 
     alarms.add(alarm);
+
+    if (exists)
+      alarmFirestoreService.editAlarm(alarm);
+    else
+      alarmFirestoreService.saveAlarm(alarm);
+
     if(alarm.enabled)
       setNextAlarm(alarm);
   }
 
-  static AlarmCustom getAlarmById(int AlarmID){
+  void toggleAlarmEnable(int AlarmId){
+    AlarmCustom alarm = getAlarmById(AlarmId);
+
+    if(alarm.enabled){
+      stopAlarm(AlarmId);
+      alarm.enabled = false;
+      return;
+    }
+
+    alarm.enabled = true;
+    setNextAlarm(alarm);
+
+  }
+
+  void loadAlarms(){
+
+  }
+
+  AlarmCustom getAlarmById(int AlarmID){
     for(final alarm in alarms){
       if(alarm.id == AlarmID) return alarm;
     }
     throw Exception("Alarm not found");
   }
 
-  static List<AlarmCustom> getAlarmsList(){
+  List<AlarmCustom> getAlarmsList(){
     return alarms;
   }
 
-  static void setNextAlarm(AlarmCustom alarm){
+  void setNextAlarm(AlarmCustom alarm){
     AlarmSettings newAlarm = AlarmSettings(
       id: alarm.id,
       dateTime: getNextDateTime(hour: alarm.hour, minute: alarm.minute, ringingDays: alarm.ringingDays),
@@ -40,7 +84,7 @@ class AlarmService {
     Alarm.set(alarmSettings: newAlarm);
   }
 
-  static void setNextAlarmWithTime(AlarmCustom alarm, DateTime time){
+  void setNextAlarmWithTime(AlarmCustom alarm, DateTime time){
     AlarmSettings newAlarm = AlarmSettings(
       id: alarm.id,
       dateTime: time,
@@ -53,7 +97,7 @@ class AlarmService {
     Alarm.set(alarmSettings: newAlarm);
   }
 
-  static DateTime getNextDateTime({required int hour, required int minute, required List<bool> ringingDays}){
+  DateTime getNextDateTime({required int hour, required int minute, required List<bool> ringingDays}){
     DateTime NextDateTime = DateTime.now().copyWith(hour: hour, minute: minute, second: 0, millisecond: 0);
     if(NextDateTime.isBefore(DateTime.now())) NextDateTime = NextDateTime.add(Duration(days: 1));
     print("Ringing days" + ringingDays.toString());
@@ -70,20 +114,21 @@ class AlarmService {
   }
 
 
-  static DateTime getAlarmSetTime(int AlarmId){
+  DateTime getAlarmSetTime(int AlarmId){
     AlarmCustom alarm = getAlarmById(AlarmId);
     return getNextDateTime(hour: alarm.hour, minute: alarm.minute, ringingDays: alarm.ringingDays, );
   }
 
 
 /// implement a function to get the alarm id and stop it (delete alarm)
-  static void stopAlarm(int AlarmId){
+  void stopAlarm(int AlarmId){
     Alarm.stop(AlarmId);
   }
 
 
-  static void deleteAlarm(int AlarmId){
+  void deleteAlarm(int AlarmId){
     stopAlarm(AlarmId);
+    alarmFirestoreService.deleteAlarm(AlarmId);
     for(int i = 0; i < alarms.length; i++){
       if(alarms[i].id == AlarmId) {
         alarms.removeAt(i);
@@ -93,7 +138,7 @@ class AlarmService {
   }
 
 /// implement a function to call once an alarm is stopped so its next alarm is set up
-  static void handleAlarmStop(int AlarmId){
+  void handleAlarmStop(int AlarmId){
     stopAlarm(AlarmId);
     AlarmCustom alarm = getAlarmById(AlarmId);
 
@@ -102,11 +147,15 @@ class AlarmService {
     if(handleGroupedAlarm(alarm)) return;
 
     print("Contains atleast 1 true: " + alarm.ringingDays.contains(true).toString());
-    if(!alarm.ringingDays.contains(true)) return;
+    if(!alarm.ringingDays.contains(true)) {
+      alarm.enabled = false;
+      addAlarm(alarm);
+      return;
+    }
     setNextAlarm(alarm);
   }
 
-  static bool handleGroupedAlarm(AlarmCustom alarm){
+  bool handleGroupedAlarm(AlarmCustom alarm){
 
     if(alarm.delay == 0) return false;
 
@@ -121,3 +170,4 @@ class AlarmService {
     return false;
   }
 }
+

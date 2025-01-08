@@ -22,24 +22,12 @@ class _LoginButtonState extends State<LoginButtonWidget>{
     void navigateToProfileScreen() async {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => ProfileScreen(authService: widget.authService,)),
-      ).then((_) => setState(() {}));
-    }
-
-    void navigateToLoginScreen() async {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => LoginScreen(authService: widget.authService,)),
-      ).then((_) => setState(() {}));
+      );
     }
 
     print("Current User: " + FirebaseAuth.instance.currentUser.toString());
 
-    if(FirebaseAuth.instance.currentUser == null){
-      return ElevatedButton(onPressed: navigateToLoginScreen, child: Text("Login"));
-    }
-
     return IconButton(
         onPressed: navigateToProfileScreen, icon: Icon(Icons.person));
-
   }
-
 }

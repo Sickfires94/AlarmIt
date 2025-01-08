@@ -12,9 +12,10 @@ import 'package:flutter/material.dart';
 import '../widgets/WeekdaysPicker.dart';
 
 class AlarmEditScreen extends StatefulWidget {
-  AlarmEditScreen(int AlarmID, {super.key}){
+  AlarmService alarmService;
+  AlarmEditScreen(int AlarmID, {super.key, required this.alarmService}){
     if (AlarmID != -1)
-      alarmCustom = AlarmService.getAlarmById(AlarmID);
+      alarmCustom = alarmService.getAlarmById(AlarmID);
     else
       alarmCustom = null;
   }
@@ -49,6 +50,8 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
 
   final _formKey = GlobalKey<FormState>();
   TextEditingController repeatController = TextEditingController();
+  final titleController = TextEditingController();
+  final bodyController = TextEditingController();
 
 
   @override
@@ -67,8 +70,8 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
       vibrate = true;
       volume = null;
       alarmMusicPath = 'assets/alarm.mp3';
-      title = "New Alarm";
-      body = "For new Reminders";
+      titleController.text = "New Alarm";
+      bodyController.text = "For new Reminders";
       ringingDays = [false, false, false, false, false, false, false, false];
       repeatNo = 0;
       repeatIteration = 0;
@@ -77,16 +80,16 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
       print("Reached Here");
       // selectedDateTime = DateTime(hour = widget.alarmCustom!.hour, minute = widget.alarmCustom!.minute);
       id = widget.alarmCustom!.id;
-      print("DateTimeRecieved: " + AlarmService.getAlarmSetTime(id).toString());
+      print("DateTimeRecieved: " + widget.alarmService.getAlarmSetTime(id).toString());
       // selectedDateTime = AlarmService.getNextDateTime(hour: widget.alarmCustom!.hour, minute : widget.alarmCustom!.minute);
-      selectedDateTime = AlarmService.getAlarmSetTime(id);
+      selectedDateTime = widget.alarmService.getAlarmSetTime(id);
       loopAudio = widget.alarmCustom!.loopAudio;
       vibrate = widget.alarmCustom!.vibrate;
       enabled = widget.alarmCustom!.enabled;
       volume = widget.alarmCustom!.volume;
       alarmMusicPath = widget.alarmCustom!.alarmMusicPath;
-      title = widget.alarmCustom!.title;
-      body = widget.alarmCustom!.body;
+      titleController.text = widget.alarmCustom!.title;
+      bodyController.text = widget.alarmCustom!.body;
       ringingDays = widget.alarmCustom!.ringingDays;
       repeatNo = widget.alarmCustom!.repeatNo;
       delay = widget.alarmCustom!.delay;
@@ -109,6 +112,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
   }
 
   void setRepeatDays(List<bool> days){
+    print("days: " + days.toString());
     if(days.length != 8) return;
     setState(() {
       ringingDays = days;
@@ -170,8 +174,8 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
       vibrate: vibrate,
       volume: volume,
       alarmMusicPath: alarmMusicPath,
-      title: title,
-      body: body,
+      title: titleController.text,
+      body: bodyController.text,
       // notificationSettings: const NotificationSettings(
       //   title: 'This is the title',
       //   body: 'This is the body',
@@ -189,7 +193,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
 
     // TODO call buildAlarmSettings and store result in AlarmService that will set and manage Alarms
     AlarmCustom alarm = buildAlarmSettings();
-    AlarmService.addAlarm(alarm);
+    widget.alarmService.addAlarm(alarm);
     Navigator.pop(context, true);
 
     // Alarm.set(alarmSettings: buildAlarmSettings()).then((res) {
@@ -200,7 +204,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
 
   void deleteAlarm() {
     // TODO tell service to stop the alarm with the current id
-    AlarmService.deleteAlarm(id);
+    widget.alarmService.deleteAlarm(id);
     Navigator.pop(context);
 
     // Alarm.stop(widget.alarmCustom!.id).then((res) {
@@ -215,43 +219,46 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
+              IconButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'Cancel',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(color: Colors.blueAccent),
-                ),
+                icon: Icon(Icons.close_sharp, size: 40, color: Colors.red,)
               ),
-              TextButton(
+              SizedBox(
+                width: 200,
+                  child: TextField(
+                    style:TextStyle(fontSize:25),
+                    textAlign: TextAlign.end,
+                controller: titleController,
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.edit, size: 20,),
+                  border: InputBorder.none,
+                ),)
+              ),
+              IconButton(
                 onPressed: saveAlarm,
-                child: loading
-                    ? const CircularProgressIndicator()
-                    : Text(
-                  'Save',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(color: Colors.blueAccent),
-                ),
+                icon: Icon(Icons.check, size: 40, color: Colors.green,)
               ),
             ],
           ),
+
+          SizedBox(height: 20,),
           Text(
             getDay(),
             style: Theme.of(context)
                 .textTheme
-                .titleMedium!
-                .copyWith(color: Colors.blueAccent.withOpacity(0.8)),
+                .titleLarge!
+                .copyWith(color: Colors.white.withOpacity(0.8)),
           ),
           RawMaterialButton(
             onPressed: pickTime,
-            fillColor: Colors.grey[200],
+            //fillColor: Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15), // Add some border radius for visual appeal
+            ),
             child: Container(
               margin: const EdgeInsets.all(20),
               child: Text(
@@ -265,11 +272,13 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
           ),
 
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [WeekdaysPicker(initialSelectedDays: ringingDays, onSelectionChanged: setRepeatDays,)],
           ),
+          SizedBox(height: 20,),
           Column(
             children: [
-              Text("Repeat Alarm"),
+              Text("Repeat Alarm", style: TextStyle(fontSize: 20),),
               NumberPicker(
                 value: repeatNo,
                 minValue: 0,
@@ -277,12 +286,12 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
                 axis: Axis.horizontal,
                 onChanged: (value) => setState(() => repeatNo = value),
               ),
-              Text("Delay (Minutes)"),
+              Text("Delay (Minutes)", style: TextStyle(fontSize: 20),),
               NumberPicker(
                 value: delay,
                 minValue: 0,
                 maxValue: 60,
-                step: 1,
+                step: 5,
                 axis: Axis.horizontal,
                 onChanged: (value) => setState(() {
                   delay = value;
@@ -290,13 +299,31 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
               )
             ],
           ),
+
+
+          // TextFormField(
+          //   controller: bodyController,
+          //   decoration: const InputDecoration(
+          //     labelText: 'Body',
+          //     border: OutlineInputBorder(),
+          //   ),
+          // ),
+          // const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Loop alarm audio',
-                style: Theme.of(context).textTheme.titleMedium,
+              Text("Enabled", style: TextStyle(fontSize: 20),),
+              Switch(
+                value: enabled,
+                onChanged: (value) =>
+                    setState(() => enabled = value),
               ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Loop alarm audio', style: TextStyle(fontSize: 20),),
               Switch(
                 value: loopAudio,
                 onChanged: (value) => setState(() => loopAudio = value),
@@ -306,10 +333,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Vibrate',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              Text('Vibrate', style: TextStyle(fontSize: 20),),
               Switch(
                 value: vibrate,
                 onChanged: (value) => setState(() => vibrate = value),
@@ -323,8 +347,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children:[
                 Text(
-                'Sound',
-                style: Theme.of(context).textTheme.titleMedium,
+                'Sound', style: TextStyle(fontSize: 20),
               ),
               SizedBox(width: 10,),
               ElevatedButton(onPressed: pickLocalMusic, child: Icon(Icons.search))]),
@@ -339,8 +362,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Custom volume',
-                style: Theme.of(context).textTheme.titleMedium,
+                'Custom volume', style: TextStyle(fontSize: 20),
               ),
               Switch(
                 value: volume != null,
@@ -375,15 +397,9 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
                 : const SizedBox(),
           ),
           if (!creating)
-            TextButton(
+            IconButton(
               onPressed: deleteAlarm,
-              child: Text(
-                'Delete Alarm',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(color: Colors.red),
-              ),
+              icon: Icon(Icons.delete, color: Colors.red, size:50,)
             ),
           const SizedBox(),
         ],

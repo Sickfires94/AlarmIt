@@ -47,7 +47,7 @@ class _WeekdaysPickerState extends State<WeekdaysPicker> {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isSelected ? Colors.blue : Colors.grey[300],
+              color: isSelected ? Colors.green : Colors.redAccent,
             ),
             child: Center(
               child: Text(
