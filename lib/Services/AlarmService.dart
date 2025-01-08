@@ -30,8 +30,8 @@ class AlarmService {
         break;
       }
     }
-
-    alarms.add(alarm);
+    if(!exists)
+      alarms.add(alarm);
 
     if (exists)
       alarmFirestoreService.editAlarm(alarm);

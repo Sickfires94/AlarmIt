@@ -31,7 +31,7 @@ import 'package:flutter/material.dart';
 
     dropdownItems.add(DropdownMenuItem<String>(
       value: path,
-      child: Text(filename),
+      child: Text(filename.substring(0,20)),
     ));
   }
 
