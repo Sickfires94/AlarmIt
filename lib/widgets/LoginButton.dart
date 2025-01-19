@@ -6,22 +6,12 @@ import 'package:flutter/material.dart';
 import '../Screens/Login.dart';
 import '../Screens/Profile.dart';
 
-class LoginButtonWidget extends StatefulWidget {
-  final AuthService authService;
-
-  LoginButtonWidget({super.key, required this.authService});
-
-
-  State<LoginButtonWidget> createState() => _LoginButtonState();
-
-}
-
-class _LoginButtonState extends State<LoginButtonWidget>{
+class LoginButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     void navigateToProfileScreen() async {
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => ProfileScreen(authService: widget.authService,)),
+        MaterialPageRoute(builder: (context) => ProfileScreen()),
       );
     }
 

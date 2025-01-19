@@ -1,6 +1,7 @@
 import 'dart:async';
 
 
+import 'package:alarm_it/Services/AlarmEditBloc.dart';
 import 'package:alarm_it/Services/AlarmFirestore.dart';
 import 'package:alarm_it/Services/AlarmListBloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,94 +22,81 @@ import 'AlarmsList.dart';
 import 'Login.dart';
 
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({required this.authService});
+class HomeScreen extends StatelessWidget {
+  StreamSubscription<AlarmSettings>? ringSubscription;
 
-  final AuthService authService;
+  // late AlarmService alarmService;
+  // AlarmFirestoreService alarmFirestoreService = new AlarmFirestoreService();
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<AlarmSettings> alarms = [];
 
-  static StreamSubscription<AlarmSettings>? ringSubscription;
-  static StreamSubscription<int>? updateSubscription;
-  late AlarmService alarmService;
-  AlarmFirestoreService alarmFirestoreService = new AlarmFirestoreService();
+  // Future<void> loadAlarms() async {
+  //   final updatedAlarms = await Alarm.getAlarms();
+  //   updatedAlarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
+  //   setState(() {
+  //     alarms = updatedAlarms;
+  //   });
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    AlarmPermissions.checkNotificationPermission();
-    if (Alarm.android) {
-      AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
-    }
-    unawaited(loadAlarms());
-    ringSubscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
-    updateSubscription ??= Alarm.updateStream.stream.listen((_) {
-      unawaited(loadAlarms());
-    });
-  }
 
-  Future<void> loadAlarms() async {
-    final updatedAlarms = await Alarm.getAlarms();
-    updatedAlarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
-    setState(() {
-      alarms = updatedAlarms;
-    });
-  }
 
-  Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (context) =>
-            AlarmRingScreen(alarmSettings: alarmSettings, alarmService: alarmService,),
-      ),
-    );
-    unawaited(loadAlarms());
-  }
 
 
   @override
   void dispose() {
     ringSubscription?.cancel();
-    updateSubscription?.cancel();
-    super.dispose();
+    // updateSubscription?.cancel();
+    // super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (context) =>
+              AlarmRingScreen(alarmSettings: alarmSettings),
+        ),
+      );
+    }
+
+    AlarmPermissions.checkNotificationPermission();
+    if (Alarm.android) {
+      AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
+    }
+    ringSubscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
+
+
     print("Reached");
        return BlocBuilder<AlarmListBloc, AlarmState>(builder: (context, state) {
          if(state is AlarmsLoaded) {
            print("Alarms Loaded");
-          alarmService = new AlarmService(
-              alarms: state.alarms, alarmFirestoreService: alarmFirestoreService);
+          // alarmService = new AlarmService(
+          //     alarms: state.alarms, alarmFirestoreService: alarmFirestoreService);
           return Scaffold(
             appBar: AppBar(
               title: const Text('Alarm IT'),
-              actions: [LoginButtonWidget(authService: widget.authService)],
+              actions: [LoginButtonWidget()],
             ),
-            body: AlarmsList(alarms: state.alarms, alarmService: alarmService,),
+            body: AlarmsList(),
             floatingActionButton:
                  //  AlarmHomeShortcutButton(refreshAlarms: loadAlarms),
                   FloatingActionButton(
-                    onPressed: () => navigateToAlarmScreen(-1).then((value) => setState(() {})),
+                    onPressed: () => navigateToAlarmScreen(context, -1),
                     child: const Icon(Icons.alarm_add_rounded, size: 33),
                   ),
             );
         }
 
-        if (state is AlarmsInitial) context.read<AlarmListBloc>().add(fetchAlarms());
+        if (state is AlarmsInitial) context.read<AlarmListBloc>().add(fetchAlarmsList());
          // if (state is AlarmsLoading) context.read<AlarmListBloc>().add(fetchAlarms());
 
         return Scaffold(
           appBar: AppBar(
             title: const Text('ALARM IT'),
-            actions: [LoginButtonWidget(authService: widget.authService)],
+            actions: [LoginButtonWidget()],
           ),
           body: Center(child: CircularProgressIndicator(),),
         );
@@ -121,7 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
   //   ).then((_) => setState(() {}));
   // }
 
-  Future<void> navigateToAlarmScreen(int AlarmID) async {
+  Future<void> navigateToAlarmScreen(BuildContext context, int AlarmId) async {
+
+    context.read<AlarmEditBloc>()..add(getAlarm(AlarmId: AlarmId));
+
     final res = await showModalBottomSheet<bool?>(
       context: context,
       isScrollControlled: true,
@@ -130,9 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      builder: (context) {
-        return AlarmEditScreen(AlarmID, alarmService: alarmService);
-      },
+    builder: (context) => AlarmEditScreen(),
     );
   }
 }

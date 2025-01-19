@@ -7,14 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../Services/AlarmListBloc.dart';
 
 class ProfileScreen extends StatelessWidget{
-  final AuthService authService;
-
-  ProfileScreen({required this.authService});
 
   Widget build(BuildContext context) {
 
     void handleLogout() async {
-      await authService.logout();
+      // await authService.logout();
       Navigator.of(context)..pop()..pop();
     }
 

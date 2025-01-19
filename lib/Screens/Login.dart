@@ -1,49 +1,31 @@
 import 'package:alarm_it/Screens/Home.dart';
 import 'package:alarm_it/Services/AlarmListBloc.dart';
 import 'package:alarm_it/Services/AuthService.dart';
+import 'package:alarm_it/Services/LoginBloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   final AuthService authService = new AuthService();
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool _isLoginMode = true;
 
-  String _email = '';
-  String _password = '';
 
-  void _submitForm() async {
+
+  void _submitForm(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      var state = context.read<LoginBloc>().state;
+
       try {
         // Perform login/signup logic here
-        if (_isLoginMode) {
-          await widget.authService.login(email: _email, password: _password);
+        if (state is LoginPageSelected) {
+          context.read<LoginBloc>().add(handleLogin(context: context));
         } else {
-          await widget.authService
-              .registration(email: _email, password: _password);
-          setState(() {
-            _isLoginMode = true;
-          });
-        }
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider<AlarmListBloc>(
-              create: (context) => AlarmListBloc(),
-              child: HomeScreen(authService: widget.authService),
-            ),
-          ),
-        );
-      } on FirebaseAuthException catch (e) {
+          context.read<LoginBloc>().add(handleRegister());
+          }
+        } on FirebaseAuthException catch (e) {
         print(e.message);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -65,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var state = context.watch<LoginBloc>().state;
     return Scaffold(
       appBar: AppBar(
         title: const Text('AlarmIt'), // More specific app name
@@ -122,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                   onSaved: (value) {
-                    _email = value!;
+                    context.read<LoginBloc>().setEmail(value ?? "");
                   },
                 ),
                 const SizedBox(height: 20),
@@ -141,14 +124,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                   onSaved: (value) {
-                    _password = value!;
+                    context.read<LoginBloc>().setPassword(value ?? "");
                   },
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: _submitForm,
+                  onPressed: () {
+                    _submitForm(context);
+                  },
                   child: Text(
-                    _isLoginMode ? 'Login' : 'Signup',
+                    (state is LoginPageSelected) ? 'Login' : 'Signup',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -160,12 +145,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 //const SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    setState(() {
-                      _isLoginMode = !_isLoginMode;
-                    });
+                    if(state is LoginPageSelected){
+                      context.read<LoginBloc>().add(showRegisterPage());
+                    }
+                    else {
+                      context.read<LoginBloc>().add(showLoginPage());
+                    }
                   },
                   child: Text(
-                    _isLoginMode
+                    (state is LoginPageSelected)
                         ? 'Don\'t have an account? Signup'
                         : 'Already have an account? Login',
                     style: TextStyle(
@@ -176,15 +164,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     try {
-                      await widget.authService.signInWithGoogle();
+                      await authService.signInWithGoogle();
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider<AlarmListBloc>(
-                            create: (context) => AlarmListBloc(),
-                            child: HomeScreen(authService: widget.authService),
-                          ),
-                        ),
+                       context,
+                        MaterialPageRoute(builder: (context) =>  HomeScreen(),),
                       );
                     } catch (e) {
                       print(e);

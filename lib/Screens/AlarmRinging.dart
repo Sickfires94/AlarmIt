@@ -5,9 +5,9 @@ import 'package:alarm_it/Services/AlarmService.dart';
 import 'package:flutter/material.dart';
 
 class AlarmRingScreen extends StatefulWidget {
-  const AlarmRingScreen({required this.alarmSettings, required this.alarmService,  super.key});
+  const AlarmRingScreen({required this.alarmSettings});
 
-  final AlarmService alarmService;
+  // final AlarmService alarmService;
   final AlarmSettings alarmSettings;
 
   @override
@@ -39,8 +39,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   }
   
   void stopAlarm(){
-    // Get current weekday and figure out the next day to recall alarm
-    widget.alarmService.handleAlarmStop(widget.alarmSettings.id);
+    AlarmService().handleAlarmStop(widget.alarmSettings.id);
   }
 
   @override

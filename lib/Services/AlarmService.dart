@@ -8,12 +8,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AlarmService {
   late List<AlarmCustom> alarms;
-  AlarmFirestoreService alarmFirestoreService;
+  AlarmFirestoreService alarmFirestoreService = AlarmFirestoreService();
 
-  AlarmService({required this.alarms, required this.alarmFirestoreService});
+  AlarmService() {
+    syncAlarms();
+  }
 
-
-
+  void syncAlarms() async {
+    alarms = (await alarmFirestoreService.getAlarms()) as List<AlarmCustom>;
+  }
 
   /// implement a function to set the next alarm according to the ALarmCustom provided
   void addAlarm(AlarmCustom alarm){
@@ -120,7 +123,7 @@ class AlarmService {
   }
 
 
-/// implement a function to get the alarm id and stop it (delete alarm)
+  /// implement a function to get the alarm id and stop it (delete alarm)
   void stopAlarm(int AlarmId){
     Alarm.stop(AlarmId);
   }
@@ -137,7 +140,7 @@ class AlarmService {
     }
   }
 
-/// implement a function to call once an alarm is stopped so its next alarm is set up
+  /// implement a function to call once an alarm is stopped so its next alarm is set up
   void handleAlarmStop(int AlarmId){
     stopAlarm(AlarmId);
     AlarmCustom alarm = getAlarmById(AlarmId);
@@ -161,13 +164,12 @@ class AlarmService {
 
     DateTime NextDateTime = DateTime.now().copyWith(hour: alarm.hour, minute: alarm.minute, second: 0, millisecond: 0);
     for(int i = 0; i < alarm.repeatNo; i++){
-     NextDateTime = NextDateTime.add(Duration(minutes: alarm.delay));
-     if(NextDateTime.isAfter(DateTime.now())){
-       setNextAlarmWithTime(alarm, NextDateTime);
-       return true;
-     }
+      NextDateTime = NextDateTime.add(Duration(minutes: alarm.delay));
+      if(NextDateTime.isAfter(DateTime.now())){
+        setNextAlarmWithTime(alarm, NextDateTime);
+        return true;
+      }
     }
     return false;
   }
 }
-
