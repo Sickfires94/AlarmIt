@@ -316,6 +316,9 @@ class AlarmEditScreen extends StatelessWidget {
               ),
             );
           }
+          if(state is AlarmSaved || state is AlarmExited){
+            Navigator.of(context).pop();
+          }
           return Text("Loading");
         });
   }

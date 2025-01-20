@@ -38,6 +38,37 @@ class AlarmCustom{
     required this.delay,
 });
 
+  AlarmCustom copyWith({
+    bool? enabled,
+    int? hour,
+    int? minute,
+    String? alarmMusicPath,
+    bool? loopAudio,
+    double? volume,
+    bool? vibrate,
+    String? title,
+    String? body,
+    List<bool>? ringingDays,
+    int? repeatNo,
+    int? delay
+  }){
+    return AlarmCustom(
+      id: this.id,
+      enabled: enabled ?? this.enabled,
+      hour: hour ?? this.hour,
+      minute: minute ?? this.minute,
+      alarmMusicPath: alarmMusicPath ?? this.alarmMusicPath,
+      loopAudio: loopAudio ?? this.loopAudio,
+      volume: volume ?? this.volume,
+      vibrate: vibrate ?? this.vibrate,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      ringingDays: ringingDays ?? this.ringingDays,
+      repeatNo: repeatNo ?? this.repeatNo,
+      delay: delay ?? this.delay
+    );
+  }
+
   factory AlarmCustom.fromJson(Map<String, dynamic> json) => AlarmCustom(
     id: json['id'],
     enabled: json['enabled'],

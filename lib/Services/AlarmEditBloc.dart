@@ -40,7 +40,7 @@ class AlarmEditBloc extends Bloc<AlarmEditEvent, AlarmEditState>{
     emit(LoadingAlarm());
     AlarmCustom alarm;
     if(AlarmId == -1) alarm = _getDefaultAlarm();
-    else alarm = alarmService.getAlarmById(AlarmId);
+    else alarm = alarmService.getAlarmById(AlarmId).copyWith();
     emit(AlarmLoaded(alarm: alarm));
   }
 

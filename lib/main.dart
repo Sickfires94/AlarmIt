@@ -9,8 +9,10 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'Screens/AlarmRinging.dart';
 import 'Screens/Home.dart';
 import 'Screens/Login.dart';
+import 'Services/AlarmPermissions.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -52,8 +54,28 @@ Future<void> main() async {
 }
 
 class AlarmIt extends StatelessWidget{
+
+  StreamSubscription<AlarmSettings>? ringSubscription;
+
   @override
   Widget build(BuildContext context) {
+
+    Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (context) =>
+              AlarmRingScreen(alarmSettings: alarmSettings),
+        ),
+      );
+    }
+
+    AlarmPermissions.checkNotificationPermission();
+    if (Alarm.android) {
+      AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
+    }
+    ringSubscription ??= Alarm.ringStream.stream.asBroadcastStream().listen(navigateToRingScreen);
+
     return LoginScreen();
   }
 

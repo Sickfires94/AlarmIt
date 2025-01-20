@@ -23,12 +23,9 @@ import 'Login.dart';
 
 
 class HomeScreen extends StatelessWidget {
-  StreamSubscription<AlarmSettings>? ringSubscription;
 
   // late AlarmService alarmService;
   // AlarmFirestoreService alarmFirestoreService = new AlarmFirestoreService();
-
-
 
   // Future<void> loadAlarms() async {
   //   final updatedAlarms = await Alarm.getAlarms();
@@ -38,38 +35,8 @@ class HomeScreen extends StatelessWidget {
   //   });
   // }
 
-
-
-
-
-  @override
-  void dispose() {
-    ringSubscription?.cancel();
-    // updateSubscription?.cancel();
-    // super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-
-    Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-      await Navigator.push(
-        context,
-        MaterialPageRoute<void>(
-          builder: (context) =>
-              AlarmRingScreen(alarmSettings: alarmSettings),
-        ),
-      );
-    }
-
-    AlarmPermissions.checkNotificationPermission();
-    if (Alarm.android) {
-      AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
-    }
-    ringSubscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
-
-
-    print("Reached");
        return BlocBuilder<AlarmListBloc, AlarmState>(builder: (context, state) {
          if(state is AlarmsLoaded) {
            print("Alarms Loaded");
@@ -122,6 +89,6 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
     builder: (context) => AlarmEditScreen(),
-    );
+    ).then((value) => context.read<AlarmListBloc>()..add(fetchAlarmsList()));
   }
 }
