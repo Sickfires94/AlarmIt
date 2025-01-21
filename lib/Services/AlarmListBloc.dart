@@ -28,10 +28,10 @@ class AlarmsLoaded extends AlarmState{
 }
 
 class AlarmListBloc extends Bloc<AlarmEvent, AlarmState>{
+    AlarmService alarmService;
+    AlarmFirestoreService alarmFirestoreService;
 
-    AlarmService alarmService = new AlarmService();
-
-    AlarmListBloc() : super(AlarmsInitial()){
+    AlarmListBloc({required this.alarmService, required this.alarmFirestoreService}) : super(AlarmsInitial()){
         on<fetchAlarmsList> (_onFetchAlarms);
         on<deleteAlarmList>((event, emit,) => _handleDelete(event.alarmId));
 
@@ -47,7 +47,7 @@ class AlarmListBloc extends Bloc<AlarmEvent, AlarmState>{
         ) async {
         emit(AlarmsLoading());
         print("Loading Alarms");
-        List<AlarmCustom?> nullableAlarms = await AlarmFirestoreService().getAlarms();
+        List<AlarmCustom?> nullableAlarms = await alarmFirestoreService.getAlarms();
         print("Recieved Alarms" + nullableAlarms.toString());
         List<AlarmCustom> alarms = getNonNullableAlarms(nullableAlarms);
         print("Converted Alarms" + alarms.toString());

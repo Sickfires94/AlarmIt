@@ -15,8 +15,6 @@ class LoginButtonWidget extends StatelessWidget {
       );
     }
 
-    print("Current User: " + FirebaseAuth.instance.currentUser.toString());
-
     return IconButton(
         onPressed: navigateToProfileScreen, icon: Icon(Icons.person));
   }

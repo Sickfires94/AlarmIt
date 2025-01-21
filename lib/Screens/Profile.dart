@@ -11,7 +11,7 @@ class ProfileScreen extends StatelessWidget{
   Widget build(BuildContext context) {
 
     void handleLogout() async {
-      // await authService.logout();
+      await AuthService().logout();
       Navigator.of(context)..pop()..pop();
     }
 

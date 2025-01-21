@@ -10,9 +10,7 @@ class LoginScreen extends StatelessWidget {
   final AuthService authService = new AuthService();
   final _formKey = GlobalKey<FormState>();
 
-
-
-  void _submitForm(BuildContext context) async {
+  void _submitForm(BuildContext context){
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -50,7 +48,7 @@ class LoginScreen extends StatelessWidget {
     var state = context.watch<LoginBloc>().state;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AlarmIt'), // More specific app name
+        title: const Text('Alarm It'), // More specific app name
         centerTitle: true,
         backgroundColor: Colors.black, // Add a color
       ),
@@ -165,6 +163,7 @@ class LoginScreen extends StatelessWidget {
                   onPressed: () async {
                     try {
                       await authService.signInWithGoogle();
+                      context.read<AlarmListBloc>()..add(fetchAlarmsList());
                       Navigator.push(
                        context,
                         MaterialPageRoute(builder: (context) =>  HomeScreen(),),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../Screens/Home.dart';
 import 'AlarmListBloc.dart';
@@ -23,6 +24,15 @@ abstract class LoginState{
 
   LoginState copyWith({String? email, String? password});
 }
+class FailedState extends LoginState {
+  String message;
+  FailedState({required this.message, required super.email, required super.password});
+
+  @override
+  LoginState copyWith({String? email, String? password}) {
+    return FailedState(email: email ?? this.email, password: password ?? this.password, message: '',);
+  }
+}
 
 
 class LoginPageSelected extends LoginState{
@@ -43,9 +53,9 @@ class RegisterPageSelected extends LoginState{
 
 
 class LoginBloc extends Bloc<LoginEvent, LoginState>{
-  final AuthService authService = new AuthService();
+  final AuthService authService;
 
-  LoginBloc() : super(LoginPageSelected(email: 'Email Here', password: 'Password Here')){
+  LoginBloc({required this.authService}) : super(LoginPageSelected(email: 'Email Here', password: 'Password Here')){
     on<showLoginPage>((event, emit) => emit(LoginPageSelected(email: state.email, password: state.password)));
     on<showRegisterPage>((event, emit) => emit(RegisterPageSelected(email: state.email, password: state.password)));
     on<handleLogin>((event, emit,) => _handleLogin(event.context));
@@ -57,8 +67,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState>{
 
   void _handleLogin(BuildContext context) async {
     print("Email: " + state.email);
-    print("Password" + state.password);
-      await authService.login(email: state.email, password: state.password);
+    print("Password: " + state.password);
+    try{
+      print("Trying login");
+      print(await authService.login(email: state.email, password: state.password));
+      print("Successfully Logged in");
+    }
+    on FirebaseAuthException catch (e) {
+      rethrow;
+    }
+    context.read<AlarmListBloc>()..add(fetchAlarmsList());
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) =>  HomeScreen(),),
     );

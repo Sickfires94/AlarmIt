@@ -26,9 +26,9 @@ class AlarmSaved extends AlarmEditState{}
 class AlarmExited extends AlarmEditState{}
 
 class AlarmEditBloc extends Bloc<AlarmEditEvent, AlarmEditState>{
-  AlarmService alarmService = new AlarmService();
+  final AlarmService alarmService;
 
-  AlarmEditBloc() : super(EditAlarmInitial()){
+  AlarmEditBloc({required this.alarmService}) : super(EditAlarmInitial()){
     on<getAlarm>((event, emit,) => _getAlarm(AlarmId: event.AlarmId));
     on<saveAlarm>((event, emit,) => _saveAlarm());
     on<deleteAlarm>((event, emit,) => _deleteAlarm());
@@ -39,8 +39,12 @@ class AlarmEditBloc extends Bloc<AlarmEditEvent, AlarmEditState>{
   _getAlarm({required int AlarmId}){
     emit(LoadingAlarm());
     AlarmCustom alarm;
-    if(AlarmId == -1) alarm = _getDefaultAlarm();
-    else alarm = alarmService.getAlarmById(AlarmId).copyWith();
+    if(AlarmId == -1) {
+      alarm = _getDefaultAlarm();
+    } else {
+      alarm = alarmService.getAlarmById(AlarmId).copyWith();
+      print("Returning Alarm: " + alarm.toString());
+    }
     emit(AlarmLoaded(alarm: alarm));
   }
 
@@ -69,9 +73,9 @@ class AlarmEditBloc extends Bloc<AlarmEditEvent, AlarmEditState>{
     return alarmCustom;
   }
 
-  void _saveAlarm(){
-    if (state is AlarmLoaded) {
-      alarmService.addAlarm((state as AlarmLoaded).alarm);
+  void _saveAlarm() async {
+    if (state is AlarmLoaded)  {
+      await alarmService.addAlarm((state as AlarmLoaded).alarm.copyWith());
       emit(AlarmSaved());
     }
   }

@@ -16,7 +16,6 @@ import '../Services/AlarmPermissions.dart';
 import '../Services/AuthService.dart';
 import '../widgets/AlarmTile.dart';
 import 'AlarmEdit.dart';
-import 'AlarmHomeShortcutButton.dart';
 import 'AlarmRinging.dart';
 import 'AlarmsList.dart';
 import 'Login.dart';
@@ -34,6 +33,7 @@ class HomeScreen extends StatelessWidget {
   //     alarms = updatedAlarms;
   //   });
   // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +89,7 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
     builder: (context) => AlarmEditScreen(),
-    ).then((value) => context.read<AlarmListBloc>()..add(fetchAlarmsList()));
+    ).then((value) => context.read<AlarmListBloc>()..add(fetchAlarmsList())
+    );
   }
 }

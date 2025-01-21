@@ -10,16 +10,15 @@ class AlarmService {
   late List<AlarmCustom> alarms;
   AlarmFirestoreService alarmFirestoreService = AlarmFirestoreService();
 
-  AlarmService() {
-    syncAlarms();
-  }
 
   void syncAlarms() async {
     alarms = (await alarmFirestoreService.getAlarms()) as List<AlarmCustom>;
   }
 
   /// implement a function to set the next alarm according to the ALarmCustom provided
-  void addAlarm(AlarmCustom alarm){
+  Future<void> addAlarm(AlarmCustom alarm) async {
+    syncAlarms();
+    print(alarms);
     bool exists = false;
 
     // print("Editing alarm? " + alarms.contains(alarm).toString());
@@ -37,15 +36,17 @@ class AlarmService {
       alarms.add(alarm);
 
     if (exists)
-      alarmFirestoreService.editAlarm(alarm);
+      await alarmFirestoreService.editAlarm(alarm);
     else
-      alarmFirestoreService.saveAlarm(alarm);
+      await alarmFirestoreService.saveAlarm(alarm);
 
     if(alarm.enabled)
       setNextAlarm(alarm);
+
   }
 
   void toggleAlarmEnable(int AlarmId){
+    syncAlarms();
     AlarmCustom alarm = getAlarmById(AlarmId);
 
     if(alarm.enabled){
@@ -59,11 +60,9 @@ class AlarmService {
 
   }
 
-  void loadAlarms(){
-
-  }
 
   AlarmCustom getAlarmById(int AlarmID){
+    syncAlarms();
     for(final alarm in alarms){
       if(alarm.id == AlarmID) return alarm;
     }
@@ -71,6 +70,7 @@ class AlarmService {
   }
 
   List<AlarmCustom> getAlarmsList(){
+    syncAlarms();
     return alarms;
   }
 
@@ -79,7 +79,11 @@ class AlarmService {
       id: alarm.id,
       dateTime: getNextDateTime(hour: alarm.hour, minute: alarm.minute, ringingDays: alarm.ringingDays),
       assetAudioPath: alarm.alarmMusicPath,
-      notificationSettings: NotificationSettings(title: alarm.title, body: alarm.body),
+      notificationSettings: NotificationSettings(
+        title: alarm.title,
+        body: alarm.body,
+        stopButton: 'Stop the alarm',
+        icon: 'notification_icon',),
       loopAudio:alarm.loopAudio,
       volume:alarm.volume,
       vibrate: alarm.vibrate,
@@ -92,7 +96,11 @@ class AlarmService {
       id: alarm.id,
       dateTime: time,
       assetAudioPath: alarm.alarmMusicPath,
-      notificationSettings: NotificationSettings(title: alarm.title, body: alarm.body),
+      notificationSettings: NotificationSettings(
+        title: alarm.title,
+        body: alarm.body,
+        stopButton: 'Stop the alarm',
+        icon: 'notification_icon',),
       loopAudio:alarm.loopAudio,
       volume:alarm.volume,
       vibrate: alarm.vibrate,
@@ -130,6 +138,7 @@ class AlarmService {
 
 
   void deleteAlarm(int AlarmId){
+    syncAlarms();
     stopAlarm(AlarmId);
     alarmFirestoreService.deleteAlarm(AlarmId);
     for(int i = 0; i < alarms.length; i++){
@@ -142,6 +151,7 @@ class AlarmService {
 
   /// implement a function to call once an alarm is stopped so its next alarm is set up
   void handleAlarmStop(int AlarmId){
+    syncAlarms();
     stopAlarm(AlarmId);
     AlarmCustom alarm = getAlarmById(AlarmId);
 
@@ -159,7 +169,7 @@ class AlarmService {
   }
 
   bool handleGroupedAlarm(AlarmCustom alarm){
-
+    syncAlarms();
     if(alarm.delay == 0) return false;
 
     DateTime NextDateTime = DateTime.now().copyWith(hour: alarm.hour, minute: alarm.minute, second: 0, millisecond: 0);

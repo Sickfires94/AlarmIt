@@ -2,8 +2,12 @@ import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:alarm_it/Services/AlarmEditBloc.dart';
+import 'package:alarm_it/Services/AlarmFirestore.dart';
 import 'package:alarm_it/Services/AlarmListBloc.dart';
+import 'package:alarm_it/Services/AlarmService.dart';
+import 'package:alarm_it/Services/AuthService.dart';
 import 'package:alarm_it/Services/LoginBloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,17 +30,21 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  final AlarmService alarmService = AlarmService();
+  final AuthService authService = AuthService();
+  final AlarmFirestoreService alarmFirestoreService = AlarmFirestoreService();
+
   runApp(
       MultiBlocProvider(
         providers: [
           BlocProvider<LoginBloc>(
-            create: (BuildContext context) => LoginBloc(),
+            create: (BuildContext context) => LoginBloc(authService: authService),
           ),
           BlocProvider<AlarmListBloc>(
-            create: (BuildContext context) => AlarmListBloc(),
+            create: (BuildContext context) => AlarmListBloc(alarmService: alarmService, alarmFirestoreService: alarmFirestoreService),
           ),
           BlocProvider<AlarmEditBloc>(
-            create: (BuildContext context) => AlarmEditBloc(),
+            create: (BuildContext context) => AlarmEditBloc(alarmService: alarmService),
           ),
         ],
           child: MaterialApp(
@@ -75,8 +83,11 @@ class AlarmIt extends StatelessWidget{
       AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
     }
     ringSubscription ??= Alarm.ringStream.stream.asBroadcastStream().listen(navigateToRingScreen);
+    if(FirebaseAuth.instance.currentUser == null)
+      return LoginScreen();
+    else
+      return HomeScreen();
 
-    return LoginScreen();
   }
 
 }

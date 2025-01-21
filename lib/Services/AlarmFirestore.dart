@@ -7,11 +7,11 @@ class AlarmFirestoreService{
 
   static final CollectionReference _collectionRef = FirebaseFirestore.instance.collection('Alarms');
 
-  void saveAlarm(AlarmCustom alarm){
+  Future<void> saveAlarm(AlarmCustom alarm) async {
     print("************* Saving Alarm to firebase ******************");
     final currentUser = FirebaseAuth.instance.currentUser;
     if(currentUser != null){
-    _collectionRef
+    await _collectionRef
         .add({
       "user": currentUser.uid,
       "alarm": alarm.toJson()

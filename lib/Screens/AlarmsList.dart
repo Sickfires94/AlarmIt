@@ -16,7 +16,7 @@ class AlarmsList extends StatelessWidget{
   Widget build(BuildContext context) {
 
     Future<void> navigateToAlarmScreen(int AlarmId) async {
-      context.watch<AlarmEditBloc>()..add(getAlarm(AlarmId: AlarmId));
+      context.read<AlarmEditBloc>()..add(getAlarm(AlarmId: AlarmId));
       final res = await showModalBottomSheet<bool?>(
         context: context,
         isScrollControlled: true,
