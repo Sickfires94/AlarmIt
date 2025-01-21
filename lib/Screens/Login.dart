@@ -45,6 +45,13 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // if(FirebaseAuth.instance.currentUser != null) {
+    //   context.read<AlarmListBloc>()..add(fetchAlarmsList());
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(builder: (context) =>  HomeScreen(),),
+    //   );
+    // };
     var state = context.watch<LoginBloc>().state;
     return Scaffold(
       appBar: AppBar(

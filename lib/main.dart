@@ -83,10 +83,8 @@ class AlarmIt extends StatelessWidget{
       AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
     }
     ringSubscription ??= Alarm.ringStream.stream.asBroadcastStream().listen(navigateToRingScreen);
-    if(FirebaseAuth.instance.currentUser == null)
-      return LoginScreen();
-    else
-      return HomeScreen();
+
+    return LoginScreen();
 
   }
 
